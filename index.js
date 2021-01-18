@@ -21,7 +21,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 
 // Define our constants, you will change these with your own
-const CALLBACK_URL     = 'http://localhost:3000/auth/twitch/callback'  // You can run locally with - http://localhost:3000/auth/twitch/callback
+const CALLBACK_URL     = 'https://twitch-auth-0.herokuapp.com/auth/twitch/callback'  // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 // Initialize Express and middlewares
 var app = express()
@@ -116,6 +116,8 @@ app.get('/', function (req, res) {
   res.send('login to get data')
 })
 
-app.listen(3000, function () {
-  console.log('Twitch auth sample listening on port 3000!')
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, function () {
+  console.log(`Twitch auth sample listening on port ${PORT}!`)
 })
