@@ -111,7 +111,7 @@ app.get('/auth/twitch/callback', passport.authenticate('twitch'), (req, res) => 
 
 // If user has an authenticated session, display it, otherwise display link to authenticate
 app.get('/api/current_user', function (req, res) {
-  res.send(req.user)
+  res.json(req.user)
 })
 
 app.get('/', function (req, res) {
