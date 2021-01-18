@@ -94,7 +94,9 @@ passport.use('twitch', new OAuth2Strategy({
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch'), (req, res) => res.redirect('http://localhost:3001'))
+app.get('/auth/twitch/callback', passport.authenticate('twitch'), (req, res) => res.redirect('/api/current_user'))
+// http://localhost:3001
+
 
 // Define a simple template to safely generate HTML with values from user's profile
 // var template = handlebars.compile(`
