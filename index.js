@@ -17,12 +17,16 @@ var passport       = require('passport')
 var OAuth2Strategy = require('passport-oauth').OAuth2Strategy
 var request        = require('request')
 var handlebars     = require('handlebars')
+const cors = require('cors')
+const helmet = require('helmet')
 
 // Define our constants, you will change these with your own
 const CALLBACK_URL     = 'http://localhost:3000/auth/twitch/callback'  // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 // Initialize Express and middlewares
 var app = express()
+app.use(helmet())
+app.use(cors())
 // app.use(session({secret: SESSION_SECRET, resave: false, saveUninitialized: false}));
 
 app.use(
@@ -90,7 +94,7 @@ passport.use('twitch', new OAuth2Strategy({
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/api/current_user', failureRedirect: '/' }))
+app.get('/auth/twitch/callback', passport.authenticate('twitch'), (req, res) => res.redirect('http://localhost:3001'))
 
 // Define a simple template to safely generate HTML with values from user's profile
 // var template = handlebars.compile(`
