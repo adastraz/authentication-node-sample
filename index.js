@@ -27,6 +27,7 @@ const CALLBACK_URL     = 'https://twitch-auth-0.herokuapp.com/auth/twitch/callba
 var app = express()
 app.use(helmet())
 app.use(cors())
+app.use(express.json())
 // app.use(session({secret: SESSION_SECRET, resave: false, saveUninitialized: false}));
 
 app.use(
@@ -110,8 +111,8 @@ app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedire
 // </table></html>`)
 
 // If user has an authenticated session, display it, otherwise display link to authenticate
-app.get('/api/current_user', function (req, res) {
-  res.send(req.user)
+app.get('/api/current_user', (req, res) => {
+  res.status(200).json(res.user)
 })
 
 app.get('/', function (req, res) {
