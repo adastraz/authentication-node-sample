@@ -95,7 +95,7 @@ passport.use('twitch', new OAuth2Strategy({
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/api/current_user', failureRedirect: '/' }))
+app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: 'http://localhost:3000', failureRedirect: '/' }))
 // http://localhost:3001
 
 
