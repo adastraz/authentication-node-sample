@@ -87,7 +87,7 @@ passport.use('twitch', new OAuth2Strategy({
     //  done(err, user);
     //});
 
-    done(null, profile)
+    return done(null, profile)
   }
 ))
 
@@ -112,7 +112,7 @@ app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedire
 
 // If user has an authenticated session, display it, otherwise display link to authenticate
 app.get('/api/current_user', (req, res) => {
-  res.status(200).json(req.user)
+  res.send(req.user)
 })
 
 app.get('/', function (req, res) {
