@@ -31,7 +31,7 @@ app.use(cors())
 
 app.use(
   cookieSession({ 
-      maxAge: 364 * 24 * 60 * 60 * 1000,
+      maxAge: 5 * 60 * 60 * 1000,
       keys: [keys.cookieKey]
   })
 )
@@ -94,7 +94,7 @@ passport.use('twitch', new OAuth2Strategy({
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch'), (req, res) => res.redirect('/api/current_user'))
+app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/api/current_user', failureRedirect: '/' }))
 // http://localhost:3001
 
 
@@ -111,7 +111,7 @@ app.get('/auth/twitch/callback', passport.authenticate('twitch'), (req, res) => 
 
 // If user has an authenticated session, display it, otherwise display link to authenticate
 app.get('/api/current_user', function (req, res) {
-  res.json(req.user)
+  res.send(req.user)
 })
 
 app.get('/', function (req, res) {
