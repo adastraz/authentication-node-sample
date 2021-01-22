@@ -1,16 +1,5 @@
-/*
-Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-
-    http://aws.amazon.com/apache2.0/
-
-or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-*/
-
-// Define our dependencies
 var express        = require('express')
+const mongoose = require('mongoose')
 const cookieSession = require('cookie-session')
 const keys = require('./config/keys.js')
 var passport       = require('passport')
@@ -19,12 +8,16 @@ var request        = require('request')
 var handlebars     = require('handlebars')
 const cors = require('cors')
 const helmet = require('helmet')
+const authRouter = require('./routes/auth-routes')
+require('./models/users')
+
+mongoose.connect(keys.mongoURI, { useNewUrlParser: true })
 
 // Define our constants, you will change these with your own
 const CALLBACK_URL     = 'https://twitch-auth-0.herokuapp.com/auth/twitch/callback'  // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 // Initialize Express and middlewares
-var app = express()
+const app = express()
 app.use(helmet())
 app.use(cors())
 app.use(express.json())
@@ -37,7 +30,7 @@ app.use(
   })
 )
 
-// app.use(express.static('public'))
+const User = mongoose.model('users')
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -63,11 +56,13 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
 }
 
 passport.serializeUser(function(user, done) {
-    done(null, user)
+  done(null, user)
 })
 
 passport.deserializeUser(function(user, done) {
-    done(null, user)
+  // User.findById(user.id)
+  //   .then(user1 => done(null, user1))
+  done(null, user)
 })
 
 passport.use('twitch', new OAuth2Strategy({
@@ -77,43 +72,26 @@ passport.use('twitch', new OAuth2Strategy({
     clientSecret: keys.TWITCH_SECRET,
     callbackURL: CALLBACK_URL,
     proxy: true
-  },
-  function(accessToken, refreshToken, profile, done) {
+  }, async (accessToken, refreshToken, profile, done) => {
     profile.accessToken = accessToken
     profile.refreshToken = refreshToken
-    console.log(profile)
+    const existing = await User.findOne({ twitchID: profile.data[0].id })
+      if(existing){
+        return done(null, {user: existing, accessToken: profile.accessToken })
+      }
+      const user = await new User({ twitchID: profile.data[0].id, username: profile.data[0].display_name })
+        .save()
+      done(null, { user: user, accessToken: profile.accessToken })
+    // done(null, profile)
+
     // Securely store user profile in your DB
     //User.findOrCreate(..., function(err, user) {
     //  done(err, user);
     //});
-
-    return done(null, profile)
   }
 ))
 
-// Set route to start OAuth link, this is where you define scopes to request
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
-
-// Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: 'http://localhost:3000', failureRedirect: '/' }))
-// http://localhost:3001
-
-
-// Define a simple template to safely generate HTML with values from user's profile
-// var template = handlebars.compile(`
-// <html><head><title>Twitch Auth Sample</title></head>
-// <table>
-//     <tr><th>Access Token</th><td>{{accessToken}}</td></tr>
-//     <tr><th>Refresh Token</th><td>{{refreshToken}}</td></tr>
-//     <tr><th>Display Name</th><td>{{display_name}}</td></tr>
-//     <tr><th>Bio</th><td>{{bio}}</td></tr>
-//     <tr><th>Image</th><td>{{logo}}</td></tr>
-// </table></html>`)
-
-// If user has an authenticated session, display it, otherwise display link to authenticate
-app.get('/api/current_user', (req, res) => {
-  res.send(req.user)
-})
+app.use('/auth', authRouter)
 
 app.get('/', function (req, res) {
   res.send('login to get data')
