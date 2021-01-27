@@ -26,7 +26,8 @@ app.use(express.json())
 app.use(
   cookieSession({ 
       maxAge: 5 * 60 * 60 * 1000,
-      keys: [keys.cookieKey]
+      keys: [keys.cookieKey],
+      secure: true
   })
 )
 
@@ -56,8 +57,8 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
 }
 
 passport.serializeUser((user, done) => {
-  done(null, user._id);
-});
+  done(null, user._id)
+})
 
 passport.deserializeUser((_id, done) => {
   User.findById( _id, (err, user) => {
