@@ -77,7 +77,7 @@ passport.use('twitch', new OAuth2Strategy({
     profile.refreshToken = refreshToken
     const existing = await User.findOne({ twitchID: profile.data[0].id })
       if(existing){
-        return console.log(null, {user: existing, accessToken: profile.accessToken })
+        return done(null, {user: existing, accessToken: profile.accessToken })
       }
       const user = await new User({ twitchID: profile.data[0].id, username: profile.data[0].display_name })
         .save()
