@@ -57,7 +57,7 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
 
 passport.serializeUser(function(user, done) {
   console.log(user, user.twitchID)
-  done(null, user)
+  done(null, user.twitchID)
 })
 
 passport.deserializeUser(function(twitch, done) {
