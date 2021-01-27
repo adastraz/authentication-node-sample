@@ -55,14 +55,18 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
   })
 }
 
-passport.serializeUser(function(user, done) {
-  console.log(user, user.twitchID)
-  done(null, user.id)
-})
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
 
-passport.deserializeUser(async function(id, done) {
-  await User.findById(id)
-    .then(user => done(null, user))
+passport.deserializeUser((_id, done) => {
+  User.findById( _id, (err, user) => {
+    if(err){
+        done(null, false, {error:err});
+    } else {
+        done(null, user);
+    }
+  })
 })
 
 passport.use('twitch', new OAuth2Strategy({
