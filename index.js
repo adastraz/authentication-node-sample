@@ -60,10 +60,9 @@ passport.serializeUser(function(user, done) {
   done(null, user.id)
 })
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id)
-    .then(user => console.log(user))
-  // done(null, twitch)
+passport.deserializeUser(async function(id, done) {
+  await User.findById(id)
+    .then(user => done(null, user))
 })
 
 passport.use('twitch', new OAuth2Strategy({
