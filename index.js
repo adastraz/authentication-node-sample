@@ -61,6 +61,7 @@ passport.serializeUser(function(user, done) {
 })
 
 passport.deserializeUser(function(twitch, done) {
+  console.log(twitch)
   done(null, twitch)
 })
 
