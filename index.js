@@ -57,15 +57,15 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
 }
 
 passport.serializeUser((user, done) => {
-  done(null, user._id)
+  done(null, user.id)
 })
 
-passport.deserializeUser((_id, done) => {
-  User.findById( _id, (err, user) => {
+passport.deserializeUser((id, done) => {
+  User.findById( id, (err, user) => {
     if(err){
-        done(null, false, {error:err});
+        done(null, false, {error:err})
     } else {
-        done(null, user);
+        done(null, user)
     }
   })
 })
