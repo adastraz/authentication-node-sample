@@ -8,7 +8,8 @@ router.get('/twitch/callback', passport.authenticate('twitch', { successRedirect
 // http://localhost:3001
 
 router.get('/api/current_user', (req, res) => {
-    res.send(req.user)
+    console.log(req.user)
+    res.status(200).json(req.user)
 })
 
 router.get('/api/logout', (req, res) => {
